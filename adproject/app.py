@@ -2,7 +2,8 @@ import language_tool_python
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
-tool = language_tool_python.LanguageTool("en-US")
+tool = language_tool_python.LanguageToolPublicAPI('en-US')
+
 
 @app.route('/')
 def index():

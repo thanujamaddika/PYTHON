@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar and Spelling Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Grammar and Spelling Checker</h1>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+        <button onclick="checkText()">Check Text</button>
+        
+        <h2>Corrected Text:</h2>
+        <p id="correctedText"></p>
+        
+        <h2>Grammar Errors:</h2>
+        <ul id="grammarErrors"></ul>
+    </div>
+
+    <script>
+        async function checkText() {
+            let inputText = document.getElementById("inputText").value;
+
+            const response = await fetch("/check", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: inputText }),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+
+                // Display corrected text
+                document.getElementById("correctedText").innerText = result.corrected_text;
+
+                // Display grammar errors
+                const grammarErrorsList = document.getElementById("grammarErrors");
+                grammarErrorsList.innerHTML = ""; // Clear previous errors
+
+                if (result.grammar_errors.length > 0) {
+                    result.grammar_errors.forEach(error => {
+                        const li = document.createElement("li");
+                        li.innerText = error;
+                        grammarErrorsList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement("li");
+                    li.innerText = "No grammar errors found.";
+                    grammarErrorsList.appendChild(li);
+                }
+            } else {
+                console.error("Error:", response.statusText);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,9 @@
-import language_tool_python
 from flask import Flask, render_template, request, jsonify
+import language_tool_python
 
 app = Flask(__name__)
+
+# Initialize grammar checker
 tool = language_tool_python.LanguageTool("en-US")
 
 @app.route('/')
@@ -11,11 +13,16 @@ def index():
 @app.route('/check', methods=['POST'])
 def check_text():
     data = request.get_json()
-    text = data.get('text', '')
+    if not data or 'text' not in data:
+        return jsonify({"error": "No text provided"}), 400
 
+    text = data['text']
+
+    # Perform grammar checking
     matches = tool.check(text)
     corrected_text = language_tool_python.utils.correct(text, matches)
 
+    # Extract grammar errors
     errors = [match.message for match in matches]
 
     return jsonify({
@@ -24,4 +31,4 @@ def check_text():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    app.run(debug=True)
